@@ -90,11 +90,13 @@ describe('Custom Errors', () => {
 
   describe('InsufficientFundsError', () => {
     it('should include balance and amount in message', () => {
-      const error = new InsufficientFundsError(50.5, 100);
+      const error = new InsufficientFundsError(5050, 10000);
 
       expect(error.statusCode).toBe(400);
-      expect(error.message).toContain('50.50');
-      expect(error.message).toContain('100.00');
+      expect(error.message).toContain('$50.50');
+      expect(error.message).toContain('5050 cents');
+      expect(error.message).toContain('$100.00');
+      expect(error.message).toContain('10000 cents');
     });
   });
 

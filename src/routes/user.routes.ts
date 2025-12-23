@@ -168,9 +168,9 @@ router.get(
  *               - amount
  *             properties:
  *               amount:
- *                 type: number
- *                 minimum: 0.01
- *                 description: Amount to credit
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Amount to credit in cents (1 = $0.01)
  *               description:
  *                 type: string
  *                 maxLength: 500
@@ -230,9 +230,9 @@ router.post(
  *               - amount
  *             properties:
  *               amount:
- *                 type: number
- *                 minimum: 0.01
- *                 description: Amount to debit
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Amount to debit in cents (1 = $0.01)
  *               description:
  *                 type: string
  *                 maxLength: 500

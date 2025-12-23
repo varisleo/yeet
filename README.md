@@ -36,13 +36,6 @@ A robust backend service for managing user wallets and transactions in a casino 
 - **Documentation**: Swagger/OpenAPI 3.0
 - **Containerization**: Docker & Docker Compose
 
-### Why These Technologies?
-
-- **Express.js**: Lightweight, flexible, and widely adopted with excellent ecosystem support
-- **TypeORM**: Type-safe database interactions with decorator-based entity definitions and built-in migration support
-- **PostgreSQL**: ACID-compliant, excellent for financial transactions with robust locking mechanisms
-- **Testcontainers**: Enables testing with real PostgreSQL instances for accurate integration tests
-
 ## Database Schema
 
 ### Entity Relationship Diagram
@@ -54,7 +47,7 @@ A robust backend service for managing user wallets and transactions in a casino 
 │ id          UUID PK                  │
 │ username    VARCHAR(50) UNIQUE       │
 │ email       VARCHAR(100)             │
-│ balance     DECIMAL(18,2)            │
+│ balance     BIGINT (cents)           │
 │ status      ENUM (active/inactive/   │
 │             suspended)               │
 │ version     INTEGER                  │
@@ -70,8 +63,8 @@ A robust backend service for managing user wallets and transactions in a casino 
 │ id              UUID PK              │
 │ user_id         UUID FK              │
 │ type            ENUM (credit/debit)  │
-│ amount          DECIMAL(18,2)        │
-│ balance_after   DECIMAL(18,2)        │
+│ amount          BIGINT (cents)       │
+│ balance_after   BIGINT (cents)       │
 │ idempotency_key VARCHAR(255) UNIQUE  │
 │ description     VARCHAR(500)         │
 │ created_at      TIMESTAMP            │
@@ -91,9 +84,9 @@ A robust backend service for managing user wallets and transactions in a casino 
 
 ### Schema Design Rationale
 
-1. **Balance as DECIMAL(18,2)**: Avoids floating-point precision issues with monetary values
+1. **Balance as BIGINT (cents)**: Stores monetary values as integers representing cents, completely eliminating floating-point precision issues. For example, $10.50 is stored as 1050 cents.
 2. **balance_after Column**: Each transaction records the resulting balance for audit trail and reconciliation
-3. **Optimistic Locking (version)**: Prevents lost updates during concurrent balance modifications
+3. **Pessimistic Locking**: Uses database row-level locks during transactions to prevent race conditions
 4. **idempotency_key**: Unique nullable column allows optional idempotency without requiring it for every request
 5. **Indexes**: Strategic indexes on frequently queried columns (username, balance, created_at, user_id)
 
@@ -224,8 +217,8 @@ After running the seed script:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/yeet-casino.git
-cd yeet-casino
+git clone https://github.com/LeoVaris/test-app.git
+cd test-app
 ```
 
 2. Start the application:
@@ -411,11 +404,3 @@ yeet/
 2. **OpenAPI/Swagger**: Full API documentation with interactive UI
 3. **Idempotent Transactions**: Support via `X-Idempotency-Key` header
 4. **Basic Authentication**: API key authentication with role-based access control
-
-## License
-
-ISC
-
----
-
-Built with ❤️ for Yeet Casino

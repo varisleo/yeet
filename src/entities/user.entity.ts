@@ -28,16 +28,7 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true })
   email: string;
 
-  @Column({
-    type: 'decimal',
-    precision: 18,
-    scale: 2,
-    default: 0,
-    transformer: {
-      to: (value: number) => value,
-      from: (value: string) => parseFloat(value),
-    },
-  })
+  @Column({ type: 'bigint', default: 0 })
   @Index()
   balance: number;
 

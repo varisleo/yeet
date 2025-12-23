@@ -114,7 +114,7 @@ describe('Yeet Casino API Integration Tests', () => {
         users.push({
           username: `testuser${i}`,
           email: `testuser${i}@example.com`,
-          balance: (i + 1) * 100,
+          balance: (i + 1) * 10000,
           status: UserStatus.ACTIVE,
         });
       }
@@ -184,7 +184,7 @@ describe('Yeet Casino API Integration Tests', () => {
       testUser = await userRepository.save({
         username: 'detailuser',
         email: 'detail@example.com',
-        balance: 500,
+        balance: 50000,
         status: UserStatus.ACTIVE,
       });
 
@@ -192,15 +192,15 @@ describe('Yeet Casino API Integration Tests', () => {
         {
           userId: testUser.id,
           type: TransactionType.CREDIT,
-          amount: 500,
-          balanceAfter: 500,
+          amount: 50000,
+          balanceAfter: 50000,
           description: 'Initial deposit',
         },
         {
           userId: testUser.id,
           type: TransactionType.DEBIT,
-          amount: 100,
-          balanceAfter: 400,
+          amount: 10000,
+          balanceAfter: 40000,
           description: 'Test debit',
         },
       ]);
@@ -216,7 +216,7 @@ describe('Yeet Casino API Integration Tests', () => {
       expect(response.body.data).toMatchObject({
         id: testUser.id,
         username: 'detailuser',
-        balance: 500,
+        balance: 50000,
         status: UserStatus.ACTIVE,
       });
       expect(response.body.data.recentTransactions).toHaveLength(2);
@@ -246,7 +246,7 @@ describe('Yeet Casino API Integration Tests', () => {
       testUser = await userRepository.save({
         username: 'txuser',
         email: 'tx@example.com',
-        balance: 1000,
+        balance: 100000,
         status: UserStatus.ACTIVE,
       });
 
@@ -255,8 +255,8 @@ describe('Yeet Casino API Integration Tests', () => {
         transactions.push({
           userId: testUser.id,
           type: i % 2 === 0 ? TransactionType.CREDIT : TransactionType.DEBIT,
-          amount: 50,
-          balanceAfter: 1000 + (i % 2 === 0 ? 50 : -50) * (i + 1),
+          amount: 5000,
+          balanceAfter: 100000 + (i % 2 === 0 ? 5000 : -5000) * (i + 1),
           description: `Transaction ${i}`,
         });
       }
@@ -290,7 +290,7 @@ describe('Yeet Casino API Integration Tests', () => {
       testUser = await userRepository.save({
         username: 'credituser',
         email: 'credit@example.com',
-        balance: 100,
+        balance: 10000,
         status: UserStatus.ACTIVE,
       });
     });
@@ -299,24 +299,24 @@ describe('Yeet Casino API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 50, description: 'Test credit' });
+        .send({ amount: 5000, description: 'Test credit' });
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
-      expect(response.body.previousBalance).toBe(100);
-      expect(response.body.newBalance).toBe(150);
+      expect(response.body.previousBalance).toBe(10000);
+      expect(response.body.newBalance).toBe(15000);
       expect(response.body.transaction.type).toBe(TransactionType.CREDIT);
-      expect(response.body.transaction.amount).toBe(50);
+      expect(response.body.transaction.amount).toBe(5000);
 
       const updatedUser = await userRepository.findOne({ where: { id: testUser.id } });
-      expect(updatedUser?.balance).toBe(150);
+      expect(updatedUser?.balance).toBe(15000);
     });
 
     it('should reject credit with service role', async () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', serviceApiKey)
-        .send({ amount: 50 });
+        .send({ amount: 5000 });
 
       expect(response.status).toBe(403);
     });
@@ -325,16 +325,16 @@ describe('Yeet Casino API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: -50 });
+        .send({ amount: -5000 });
 
       expect(response.status).toBe(400);
     });
 
-    it('should validate amount is a number', async () => {
+    it('should validate amount is an integer', async () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 'fifty' });
+        .send({ amount: 50.5 });
 
       expect(response.status).toBe(400);
     });
@@ -346,7 +346,7 @@ describe('Yeet Casino API Integration Tests', () => {
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
         .set('X-Idempotency-Key', idempotencyKey)
-        .send({ amount: 50 });
+        .send({ amount: 5000 });
 
       expect(response1.status).toBe(201);
 
@@ -354,13 +354,13 @@ describe('Yeet Casino API Integration Tests', () => {
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
         .set('X-Idempotency-Key', idempotencyKey)
-        .send({ amount: 50 });
+        .send({ amount: 5000 });
 
       expect(response2.status).toBe(409);
       expect(response2.body.error.code).toBe('DUPLICATE_TRANSACTION');
 
       const updatedUser = await userRepository.findOne({ where: { id: testUser.id } });
-      expect(updatedUser?.balance).toBe(150);
+      expect(updatedUser?.balance).toBe(15000);
     });
   });
 
@@ -371,7 +371,7 @@ describe('Yeet Casino API Integration Tests', () => {
       testUser = await userRepository.save({
         username: 'debituser',
         email: 'debit@example.com',
-        balance: 100,
+        balance: 10000,
         status: UserStatus.ACTIVE,
       });
     });
@@ -380,23 +380,23 @@ describe('Yeet Casino API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 30, description: 'Test debit' });
+        .send({ amount: 3000, description: 'Test debit' });
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
-      expect(response.body.previousBalance).toBe(100);
-      expect(response.body.newBalance).toBe(70);
+      expect(response.body.previousBalance).toBe(10000);
+      expect(response.body.newBalance).toBe(7000);
       expect(response.body.transaction.type).toBe(TransactionType.DEBIT);
 
       const updatedUser = await userRepository.findOne({ where: { id: testUser.id } });
-      expect(updatedUser?.balance).toBe(70);
+      expect(updatedUser?.balance).toBe(7000);
     });
 
     it('should reject debit exceeding balance', async () => {
       const response = await request(app)
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 150 });
+        .send({ amount: 15000 });
 
       expect(response.status).toBe(400);
       expect(response.body.error.message).toContain('Insufficient funds');
@@ -407,7 +407,7 @@ describe('Yeet Casino API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/users/${fakeId}/debit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 50 });
+        .send({ amount: 5000 });
 
       expect(response.status).toBe(404);
     });
@@ -419,7 +419,7 @@ describe('Yeet Casino API Integration Tests', () => {
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
         .set('X-Idempotency-Key', idempotencyKey)
-        .send({ amount: 30 });
+        .send({ amount: 3000 });
 
       expect(response1.status).toBe(201);
 
@@ -427,12 +427,12 @@ describe('Yeet Casino API Integration Tests', () => {
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
         .set('X-Idempotency-Key', idempotencyKey)
-        .send({ amount: 30 });
+        .send({ amount: 3000 });
 
       expect(response2.status).toBe(409);
 
       const updatedUser = await userRepository.findOne({ where: { id: testUser.id } });
-      expect(updatedUser?.balance).toBe(70);
+      expect(updatedUser?.balance).toBe(7000);
     });
   });
 
@@ -443,7 +443,7 @@ describe('Yeet Casino API Integration Tests', () => {
       testUser = await userRepository.save({
         username: 'atomicuser',
         email: 'atomic@example.com',
-        balance: 100,
+        balance: 10000,
         status: UserStatus.ACTIVE,
       });
     });
@@ -452,7 +452,7 @@ describe('Yeet Casino API Integration Tests', () => {
       await request(app)
         .post(`/api/users/${testUser.id}/credit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 50 });
+        .send({ amount: 5000 });
 
       const transactions = await transactionRepository.find({
         where: { userId: testUser.id },
@@ -460,15 +460,15 @@ describe('Yeet Casino API Integration Tests', () => {
 
       expect(transactions).toHaveLength(1);
       expect(transactions[0].type).toBe(TransactionType.CREDIT);
-      expect(transactions[0].amount).toBe(50);
-      expect(transactions[0].balanceAfter).toBe(150);
+      expect(transactions[0].amount).toBe(5000);
+      expect(transactions[0].balanceAfter).toBe(15000);
     });
 
     it('should create transaction record on debit', async () => {
       await request(app)
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 30 });
+        .send({ amount: 3000 });
 
       const transactions = await transactionRepository.find({
         where: { userId: testUser.id },
@@ -476,15 +476,15 @@ describe('Yeet Casino API Integration Tests', () => {
 
       expect(transactions).toHaveLength(1);
       expect(transactions[0].type).toBe(TransactionType.DEBIT);
-      expect(transactions[0].amount).toBe(30);
-      expect(transactions[0].balanceAfter).toBe(70);
+      expect(transactions[0].amount).toBe(3000);
+      expect(transactions[0].balanceAfter).toBe(7000);
     });
 
     it('should not create transaction on failed debit', async () => {
       await request(app)
         .post(`/api/users/${testUser.id}/debit`)
         .set('X-API-Key', adminApiKey)
-        .send({ amount: 200 });
+        .send({ amount: 20000 });
 
       const transactions = await transactionRepository.find({
         where: { userId: testUser.id },
@@ -493,7 +493,7 @@ describe('Yeet Casino API Integration Tests', () => {
       expect(transactions).toHaveLength(0);
 
       const user = await userRepository.findOne({ where: { id: testUser.id } });
-      expect(user?.balance).toBe(100);
+      expect(user?.balance).toBe(10000);
     });
   });
 });

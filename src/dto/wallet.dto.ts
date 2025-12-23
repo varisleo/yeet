@@ -1,12 +1,9 @@
-import { IsNumber, IsPositive, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsInt, IsPositive, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class CreditDebitDto {
-  @IsNumber(
-    { maxDecimalPlaces: 2 },
-    { message: 'Amount must be a number with at most 2 decimal places' }
-  )
+  @IsInt({ message: 'Amount must be an integer (in cents)' })
   @IsPositive({ message: 'Amount must be a positive number' })
-  @Min(0.01, { message: 'Amount must be at least 0.01' })
+  @Min(1, { message: 'Amount must be at least 1 cent' })
   amount: number;
 
   @IsOptional()

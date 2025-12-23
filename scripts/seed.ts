@@ -42,9 +42,8 @@ function randomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function randomFloat(min: number, max: number, decimals = 2): number {
-  const value = Math.random() * (max - min) + min;
-  return parseFloat(value.toFixed(decimals));
+function randomCents(minDollars: number, maxDollars: number): number {
+  return Math.floor(Math.random() * (maxDollars - minDollars) * 100) + minDollars * 100;
 }
 
 function randomInt(min: number, max: number): number {
@@ -146,7 +145,7 @@ async function seed() {
     const numTransactions = randomInt(10, 50);
     let balance = 0;
 
-    const initialDeposit = randomFloat(100, 5000);
+    const initialDeposit = randomCents(100, 5000);
     balance += initialDeposit;
 
     const initialTx = transactionRepository.create({
@@ -170,12 +169,12 @@ async function seed() {
       let amount: number;
 
       if (type === TransactionType.CREDIT) {
-        amount = randomFloat(10, 1000);
+        amount = randomCents(10, 1000);
         balance += amount;
       } else {
-        const maxDebit = Math.min(balance * 0.8, 500);
-        if (maxDebit < 1) continue;
-        amount = randomFloat(1, maxDebit);
+        const maxDebit = Math.min(Math.floor(balance * 0.8), 50000);
+        if (maxDebit < 100) continue;
+        amount = randomInt(100, maxDebit);
         balance -= amount;
       }
 
@@ -195,7 +194,7 @@ async function seed() {
       allTransactions.push(transaction);
     }
 
-    user.balance = parseFloat(balance.toFixed(2));
+    user.balance = balance;
   }
 
   const batchSize = 500;
@@ -215,12 +214,12 @@ async function seed() {
 
   const totalUsers = await userRepository.count();
   const totalTransactions = await transactionRepository.count();
-  const avgBalance = users.reduce((sum, u) => sum + u.balance, 0) / users.length;
+  const avgBalanceCents = users.reduce((sum, u) => sum + u.balance, 0) / users.length;
 
   console.log('\n--- Seed Summary ---');
   console.log(`Total users: ${totalUsers}`);
   console.log(`Total transactions: ${totalTransactions}`);
-  console.log(`Average user balance: $${avgBalance.toFixed(2)}`);
+  console.log(`Average user balance: $${(avgBalanceCents / 100).toFixed(2)} (${Math.round(avgBalanceCents)} cents)`);
   console.log(`Active users: ${users.filter((u) => u.status === UserStatus.ACTIVE).length}`);
   console.log(`Inactive users: ${users.filter((u) => u.status === UserStatus.INACTIVE).length}`);
   console.log(`Suspended users: ${users.filter((u) => u.status === UserStatus.SUSPENDED).length}`);

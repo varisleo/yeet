@@ -31,27 +31,10 @@ export class Transaction {
   @Index()
   type: TransactionType;
 
-  @Column({
-    type: 'decimal',
-    precision: 18,
-    scale: 2,
-    transformer: {
-      to: (value: number) => value,
-      from: (value: string) => parseFloat(value),
-    },
-  })
+  @Column({ type: 'bigint' })
   amount: number;
 
-  @Column({
-    name: 'balance_after',
-    type: 'decimal',
-    precision: 18,
-    scale: 2,
-    transformer: {
-      to: (value: number) => value,
-      from: (value: string) => parseFloat(value),
-    },
-  })
+  @Column({ name: 'balance_after', type: 'bigint' })
   balanceAfter: number;
 
   @Column({

@@ -40,9 +40,11 @@ export class ValidationError extends BadRequestError {
 
 export class InsufficientFundsError extends BadRequestError {
   constructor(currentBalance: number, requestedAmount: number) {
+    const balanceDollars = (currentBalance / 100).toFixed(2);
+    const amountDollars = (requestedAmount / 100).toFixed(2);
     super(
-      `Insufficient funds. Current balance: ${currentBalance.toFixed(2)}, ` +
-        `Requested amount: ${requestedAmount.toFixed(2)}`
+      `Insufficient funds. Current balance: $${balanceDollars} (${currentBalance} cents), ` +
+        `Requested amount: $${amountDollars} (${requestedAmount} cents)`
     );
   }
 }
