@@ -224,15 +224,17 @@ cd test-app
 2. Start the application:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
+
+Notice: for some reason I was not able to verify this myself, since I ran into npm networking errors. The development startup works normally.
 
 3. The API will be available at `http://localhost:3000`
 
 4. Seed the database (in a new terminal):
 
 ```bash
-docker-compose exec api npm run seed
+docker compose exec api npm run seed
 ```
 
 ### Local Development
@@ -246,7 +248,7 @@ npm install
 2. Start PostgreSQL (using Docker):
 
 ```bash
-docker-compose up postgres -d
+docker compose up postgres -d
 ```
 
 3. Create a `.env` file:
@@ -393,7 +395,7 @@ yeet/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml      # GitHub Actions CI pipeline
-├── docker-compose.yml
+├── docker compose.yml
 ├── Dockerfile
 └── package.json
 ```

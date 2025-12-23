@@ -31,10 +31,23 @@ export class Transaction {
   @Index()
   type: TransactionType;
 
-  @Column({ type: 'bigint' })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseInt(value, 10),
+    },
+  })
   amount: number;
 
-  @Column({ name: 'balance_after', type: 'bigint' })
+  @Column({
+    name: 'balance_after',
+    type: 'bigint',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseInt(value, 10),
+    },
+  })
   balanceAfter: number;
 
   @Column({

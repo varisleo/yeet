@@ -28,7 +28,14 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true })
   email: string;
 
-  @Column({ type: 'bigint', default: 0 })
+  @Column({
+    type: 'bigint',
+    default: 0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseInt(value, 10),
+    },
+  })
   @Index()
   balance: number;
 
