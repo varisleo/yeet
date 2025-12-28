@@ -368,9 +368,7 @@ The User entity includes a version column for optimistic locking:
 
 ### Balance Precision
 
-- Stored as DECIMAL(18,2) for precision
-- Supports values up to 9,999,999,999,999,999.99
-- Transformation layer converts to/from JavaScript numbers
+- Stored as BIGINT to avoid floating point issues
 
 ## Project Structure
 
