@@ -2,6 +2,8 @@
 
 A robust backend service for managing user wallets and transactions in a casino environment. Built with Node.js, Express, TypeORM, and PostgreSQL.
 
+**Notice** to avoid making this repo public in my main GitHub account, I made the project in a private repo, made it public, forked it here and finally made it private again in my main profile.
+
 ## Table of Contents
 
 - [Features](#features)
@@ -217,8 +219,8 @@ After running the seed script:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/LeoVaris/test-app.git
-cd test-app
+git clone https://github.com/varisleo/yeet.git
+cd yeet
 ```
 
 2. Start the application:
